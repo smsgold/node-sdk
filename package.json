@@ -1,0 +1,28 @@
+{
+  "name": "@smsgold/node-sdk",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Oleg Bogdanov",
+  "license": "GPL-3.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "smsgold",
+    "smsgold sdk",
+    "sms",
+    "viber",
+    "send message",
+    "api send message"
+  ],
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/node": "^12.7.2",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "axios": "^0.19.0"
+  }
+}
