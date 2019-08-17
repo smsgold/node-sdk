@@ -14,6 +14,7 @@ import API from './Api';
 import { CHANNEL, EVENTS, STATUS, STATUS_EXTEND } from './constants';
 import { fixPhone } from './utils';
 import Log from './utils/Log';
+import { PropertyError, SmsgoldSdkError } from './Errors';
 
 const defaulOptions: IOptions = {
   userId: 0,
@@ -36,18 +37,18 @@ export default class SmsgoldSdk extends EventEmitter {
 
   private init() {
     if (!this.options.scope || String(this.options.scope).length === 0) {
-      throw Log.error(new Error('Invalid scope'));
+      throw Log.error(new PropertyError('scope'));
     }
 
     if (!this.options.appId || String(this.options.appId).length === 0) {
-      throw Log.error(new Error('Invalid appId'));
+      throw Log.error(new PropertyError('appId'));
     }
 
     if (
       !this.options.userId ||
       [0, '0'].includes(this.options.userId)
     ) {
-      throw Log.error(new Error('Invalid userId'));
+      throw Log.error(new PropertyError('userId'));
     }
   }
 
@@ -106,7 +107,7 @@ export default class SmsgoldSdk extends EventEmitter {
   async uploadViberImage(fileName: string, filePath: string): Promise<void> {
 
     if (!fs.existsSync(filePath)) {
-      throw Log.error(new Error('File not fount'));
+      throw Log.error(new SmsgoldSdkError('File not fount'));
     }
 
     const getFileData = (): any => new Promise((resolve, reject) => {
@@ -125,7 +126,7 @@ export default class SmsgoldSdk extends EventEmitter {
         file
       }, { type: 'viber' });
     } else {
-      throw Log.error(new Error('Error reading file'));
+      throw Log.error(new SmsgoldSdkError('Error reading file'));
     }
   }
 
