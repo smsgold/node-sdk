@@ -4,7 +4,6 @@ export interface IOptions {
   userId: string | number;
   appId: string;
   scope: string;
-  storePath: string;
 }
 
 export interface IApiHeaders {
@@ -61,4 +60,21 @@ export interface IMessageResponse {
 
 export interface IMessageBatchIMessageBatch {
   idList: string[];
+}
+
+export interface IContactGroup {
+  codeName: string;
+  createdAt: string;
+  name: string;
+  size: number;
+  _id: string;
+}
+
+export interface IViberContentItem {
+  _id: string;
+  created: string;
+  file: string;
+  imageId: string;
+  imageUrl: string;
+  name: string;
 }
