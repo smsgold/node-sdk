@@ -1,6 +1,11 @@
 #NodeSDK
 Библиотека для работы с [API](http://gitlab.smsgold.ru/root/docs/wikis/Home) SmsGold
 
+установка
+```
+npm install --save @smsgold/node-sdk --force
+```
+
 ### Каналы < CHANNEL >
 - SMS - смс сообщения
 - VIBER - viber сообщения
