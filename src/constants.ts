@@ -1,3 +1,5 @@
+const DEBUG_LEVEL = process.env.DEBUG_LEVEL || 'info';
+
 const CHANNEL = {
   SMS: 'sms',
   VIBER: 'viber',
@@ -6,8 +8,9 @@ const CHANNEL = {
 
 const EVENTS = {
   TOKEN_DATA: 'tokenData',
-  STATUS_ID: 'statusId',
-  MESSAGE_ID: 'messageId'
+  STATUS_MESSAGE: 'statusMessage',
+  MESSAGE_ID: 'messageId',
+  MESSAGE_BATCH: 'messageBatch'
 };
 
 enum STATUS {
@@ -79,6 +82,7 @@ enum STATUS_EXTEND {
 
 export {
   CHANNEL,
+  DEBUG_LEVEL,
   EVENTS,
   STATUS,
   STATUS_EXTEND

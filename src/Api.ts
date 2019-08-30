@@ -1,12 +1,13 @@
-import axios, { AxiosInstance } from 'axios';
-import { AxiosResponseExtend, IApiOptions } from './interfaces';
-import { version } from '../package.json';
-import { isJson, isString, param } from './utils';
+import axios, {AxiosInstance} from 'axios';
+import {AxiosResponseExtend, IApiOptions} from './interfaces';
+import {version} from '../package.json';
+import {isJson, isString, param} from './utils';
 
 export default class API {
   private options: IApiOptions = {
-    baseURL: 'https://api.smsgold.ru',
+    baseURL: process.env.API_HOST || 'https://api.smsgold.ru',
     headers: {
+      'Content-Type': 'application/json; charset=utf-8',
       'X-SDK': `Node SDK | ${version}`,
       'X-Service': 'sms'
     }
@@ -18,7 +19,7 @@ export default class API {
 
   get defaultOpts() {
     return {
-      headers: { ...this.options.headers }
+      headers: {...this.options.headers}
     };
   }
 
@@ -30,6 +31,10 @@ export default class API {
   setToken(value): API {
     this.setHeader('Authorization', `Bearer ${value}`);
     return this;
+  }
+
+  useService(serviceName) {
+    this.options.headers['X-Service'] = serviceName;
   }
 
   /**
@@ -51,11 +56,17 @@ export default class API {
     return data;
   }
 
-  get(url, query?: { [key: string]: any }) {
-    return this.axios.get([url, param(query)].join(''), this.defaultOpts).then(this.response);
+  get(url, query?: {[key: string]: any}): Promise<any> {
+    return this.axios.get([this.options.baseURL, url, param(query)].join(''), this.defaultOpts).then(this.response);
   }
 
-  post(url, data, query?: { [key: string]: any }) {
-    return this.axios.post([url, param(query)].join(''), data, this.defaultOpts).then(this.response);
+  post(url, data, query?: {[key: string]: any}): Promise<any> {
+    return this.axios.post([this.options.baseURL, url, param(query)].join(''), data, this.defaultOpts).then(this.response);
+  }
+
+  upload(url, data, query?: {[key: string]: any}): Promise<any> {
+    let opts = this.defaultOpts;
+    opts.headers['Content-Type'] = 'multipart/form-data';
+    return this.axios.post([this.options.baseURL, url, param(query)].join(''), data, opts).then(this.response);
   }
 }

@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { EventEmitter } from 'events';
+import {EventEmitter} from 'events';
 import {
   IMessage,
   IMessageBatch,
@@ -11,18 +11,19 @@ import {
   IContactGroup, IViberContentItem
 } from './interfaces';
 import API from './Api';
-import { CHANNEL, EVENTS, STATUS, STATUS_EXTEND } from './constants';
-import { fixPhone } from './utils';
+import {CHANNEL, EVENTS, STATUS, STATUS_EXTEND} from './constants';
+import {fixPhone} from './utils';
 import Log from './utils/Log';
-import { PropertyError, SmsgoldSdkError } from './Errors';
+import {PropertyError, SmsgoldSdkError} from './Errors';
 
 const defaulOptions: IOptions = {
   userId: 0,
   appId: '',
-  scope: ''
+  scope: '',
+  secret: ''
 };
 
-export default class SmsgoldSdk extends EventEmitter {
+class SmsgoldSdk extends EventEmitter {
   private api: API = new API();
 
   constructor(private options: IOptions = defaulOptions) {
@@ -36,19 +37,23 @@ export default class SmsgoldSdk extends EventEmitter {
   }
 
   private init() {
+    if (!this.options.secret || String(this.options.secret).length === 0) {
+      return Log.error(new PropertyError('secret'));
+    }
+
     if (!this.options.scope || String(this.options.scope).length === 0) {
-      throw Log.error(new PropertyError('scope'));
+      return Log.error(new PropertyError('scope'));
     }
 
     if (!this.options.appId || String(this.options.appId).length === 0) {
-      throw Log.error(new PropertyError('appId'));
+      return Log.error(new PropertyError('appId'));
     }
 
     if (
       !this.options.userId ||
       [0, '0'].includes(this.options.userId)
     ) {
-      throw Log.error(new PropertyError('userId'));
+      Log.error(new PropertyError('userId'));
     }
   }
 
@@ -57,15 +62,15 @@ export default class SmsgoldSdk extends EventEmitter {
    * http://gitlab.smsgold.ru/root/docs/wikis/Auth
    */
   getToken(): Promise<IOauthToken> {
-    const { appId, scope } = this.options;
+    const {appId, scope, secret} = this.options;
     return this.api.get(`/oauth/getToken/${this.options.userId}`, {
       appId,
-      scope
+      scope,
+      secret
     }).then(data => {
       this.emit(EVENTS.TOKEN_DATA, data);
       return data;
     });
-    // todo сохраняем токены в локальную БД
   }
 
   /**
@@ -73,7 +78,7 @@ export default class SmsgoldSdk extends EventEmitter {
    * http://gitlab.smsgold.ru/root/docs/wikis/Auth
    */
   refreshToken(refreshToken: string): Promise<IOauthToken> {
-    const { appId, scope } = this.options;
+    const {appId, scope} = this.options;
     return this.api.get(`/oauth/refreshToken/${this.options.userId}`, {
       appId,
       scope,
@@ -82,7 +87,6 @@ export default class SmsgoldSdk extends EventEmitter {
       this.emit(EVENTS.TOKEN_DATA, data);
       return data;
     });
-    // todo сохраняем токены в локальную БД
   }
 
   /**
@@ -93,7 +97,7 @@ export default class SmsgoldSdk extends EventEmitter {
   }
 
   /**
-   * Получение списка загруженного контентаа для вайбера
+   * Получение списка загруженного контента для вайбера
    */
   getViberContent(): Promise<IViberContentItem[]> {
     return this.api.get('/sms/v1/userdata/viberContents');
@@ -107,7 +111,7 @@ export default class SmsgoldSdk extends EventEmitter {
   async uploadViberImage(fileName: string, filePath: string): Promise<void> {
 
     if (!fs.existsSync(filePath)) {
-      throw Log.error(new SmsgoldSdkError('File not fount'));
+      return Log.error(new SmsgoldSdkError('File not fount'));
     }
 
     const getFileData = (): any => new Promise((resolve, reject) => {
@@ -121,12 +125,12 @@ export default class SmsgoldSdk extends EventEmitter {
 
     const file = await getFileData();
     if (file) {
-      this.api.post('/upload/v1', {
+      await this.api.upload('/upload/v1', {
         fileName,
         file
-      }, { type: 'viber' });
+      }, {type: 'viber'});
     } else {
-      throw Log.error(new SmsgoldSdkError('Error reading file'));
+      Log.error(new SmsgoldSdkError('Error reading file'));
     }
   }
 
@@ -138,7 +142,7 @@ export default class SmsgoldSdk extends EventEmitter {
   getStatus(messageId: string): Promise<IMessageStatus> {
     return this.api.get(`/sms/v1/message/getStatus/${messageId}`)
       .then(data => {
-        this.emit(EVENTS.STATUS_ID, data);
+        this.emit(EVENTS.STATUS_MESSAGE, data);
         return data;
       });
   }
@@ -149,14 +153,22 @@ export default class SmsgoldSdk extends EventEmitter {
    * @param msg
    */
   sendOneMessage(msg: IMessage): Promise<IMessageResponse> {
+    const phone = fixPhone(msg.phone || '');
+
+    if (String(phone).length < 11) {
+      Log.error(new PropertyError('phone'));
+      return;
+    }
+
+    this.api.useService('sms');
     return this.api.post('/sms/v1/message/sendOne', Object.assign({
       channel: CHANNEL.SMS,
       sms_text: '',
       viber_text: '',
-      sms_sender: '',
+      sms_sender: 'SmsGold',
       viber_sender: '',
       phone: ''
-    }, msg, { phone: fixPhone(msg.phone || '') }))
+    }, msg, {phone}))
       .then(data => {
         this.emit(EVENTS.MESSAGE_ID, data.msgId);
         return data;
@@ -169,23 +181,36 @@ export default class SmsgoldSdk extends EventEmitter {
    * @param msg
    */
   sendBathMessage(msg: IMessageBatch): Promise<IMessageBatchIMessageBatch> {
+    const phones = (msg.phones || [])
+      .map(phone => fixPhone(phone || ''))
+      .filter(phone => String(phone).length >= 11);
+
+    if (phones.length > 1e4) {
+      Log.error(new SmsgoldSdkError('Maximum number of phone numbers 10000'));
+      return;
+    }
+
+    this.api.useService('sms');
     return this.api.post('/sms/v1/message/sendBatch', Object.assign({
       channel: CHANNEL.SMS,
       sms_text: '',
       viber_text: '',
-      sms_sender: '',
+      sms_sender: 'SmsGold',
       viber_sender: '',
-      phones: (msg.phones || [])
-        .filter(phone => String(phone).length >= 11)
-        .map(phone => fixPhone(phone || '')),
+      phones,
       groups: [],
       button_text: '',
       button_link: '',
       imageViber: ''
-    }, msg));
+    }, msg))
+      .then(data => {
+        this.emit(EVENTS.MESSAGE_BATCH, data.idList);
+        return data;
+      });
   }
 }
 
+export const Client = SmsgoldSdk;
 export {
   CHANNEL,
   EVENTS,

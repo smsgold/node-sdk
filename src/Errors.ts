@@ -13,10 +13,10 @@ export class SmsgoldSdkError extends Error {
 }
 
 export class PropertyError extends SmsgoldSdkError {
-  property: any;
+  property: string;
 
   constructor(property) {
-    super(`Invalid ${property}`);
+    super(`Invalid property ${property}`);
     this.name = 'PropertyError';
     this.property = property;
   }

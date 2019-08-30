@@ -1,8 +1,9 @@
-import { AxiosResponse } from 'axios';
+import {AxiosResponse} from 'axios';
 
 export interface IOptions {
   userId: string | number;
   appId: string;
+  secret: string;
   scope: string;
 }
 

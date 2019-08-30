@@ -1,13 +1,13 @@
 {
   "name": "@smsgold/node-sdk",
   "version": "1.0.0",
-  "description": "",
+  "description": "Библиотека для работы с API SmsGold",
   "author": "Oleg Bogdanov",
   "license": "GPL-3.0",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "rimraf -rf ./dist && tsc"
   },
   "keywords": [
     "smsgold",
@@ -20,6 +20,7 @@
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/node": "^12.7.2",
+    "rimraf": "^3.0.0",
     "typescript": "^3.5.3"
   },
   "dependencies": {

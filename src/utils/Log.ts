@@ -7,7 +7,7 @@
  */
 
 import * as log4js from 'log4js';
-import { DEBUG_LEVEL } from '../constants';
+import {DEBUG_LEVEL} from '../constants';
 
 log4js.configure({
   appenders: {
