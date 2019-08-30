@@ -19,7 +19,7 @@ npm install --save @smsgold/node-sdk --force
 - getViberContent() - Получение списка загруженного контента для вайбера
 - uploadViberImage() - Загрузка контента для вайбера<br/>
     [fileName] - нзвание файла отображаемого в UI<br/>
-    [filePath] - абсолютный путь в вашей вафловой системе<br/>
+    [filePath] - абсолютный путь в вашей файловой системе<br/>
 
 - getStatus( messageId ) - Получение статуса сообщения<br/>
     [messageId] - ID сообщения
