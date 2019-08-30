@@ -1,13 +1,24 @@
 {
   "name": "@smsgold/node-sdk",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Библиотека для работы с API SmsGold",
   "author": "Oleg Bogdanov",
   "license": "GPL-3.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
   "scripts": {
-    "build": "rimraf -rf ./dist && tsc"
+    "build": "rimraf -rf ./dist && tsc",
+    "prepublish": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smsgold/node-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/smsgold/node-sdk/issues"
   },
   "keywords": [
     "smsgold",
