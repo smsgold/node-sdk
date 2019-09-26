@@ -3,8 +3,19 @@ const DEBUG_LEVEL = process.env.DEBUG_LEVEL || 'info';
 const CHANNEL = {
   SMS: 'sms',
   VIBER: 'viber',
-  CASCADE: 'viber_sms'
+  CASCADE: 'viber_sms',
+  FLASH_SMS: 'flash_sms',
+  WAP_PUSH: 'wap_push',
+  VK: 'vk',
+  OK: 'ok'
 };
+
+/**
+ * Список каналов
+ * @param cn
+ * @constructor
+ */
+const CUSTOM_CHANNEL = (cn: string[]): string => [...cn].join('_');
 
 const EVENTS = {
   TOKEN_DATA: 'tokenData',
@@ -82,6 +93,7 @@ enum STATUS_EXTEND {
 
 export {
   CHANNEL,
+  CUSTOM_CHANNEL,
   DEBUG_LEVEL,
   EVENTS,
   STATUS,
