@@ -202,11 +202,10 @@ class SmsgoldSdk extends EventEmitter {
       button_text: '',
       button_link: '',
       imageViber: ''
-    }, msg))
-      .then(data => {
-        this.emit(EVENTS.MESSAGE_BATCH, data.idList);
-        return data;
-      });
+    }, msg)).then(data => {
+      this.emit(EVENTS.MESSAGE_BATCH, data);
+      return data;
+    });
   }
 }
 

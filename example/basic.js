@@ -27,7 +27,7 @@ client.on(SDK.EVENTS.MESSAGE_ID, (data) => {
 });
 
 client.on(SDK.EVENTS.MESSAGE_BATCH, (data) => {
-  console.log('message list id`s', data);
+  console.log('messages batch', data);
 });
 
 (async () => {

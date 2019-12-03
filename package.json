@@ -1,6 +1,6 @@
 {
   "name": "@smsgold/node-sdk",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "Библиотека для работы с API SmsGold",
   "author": "Oleg Bogdanov",
   "license": "GPL-3.0",
